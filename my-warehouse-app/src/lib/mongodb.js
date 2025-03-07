@@ -1,5 +1,6 @@
 import { MongoClient } from "mongodb";
 
+export const userRoles = ["admin", "user"];
 const uri = process.env.MONGODB_URI;
 const options = {
   useUnifiedTopology: true,
