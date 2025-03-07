@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Products() {
   const [products, setProducts] = useState([]);
@@ -140,15 +141,33 @@ export default function Products() {
         {loading ? (
           <p>Loading products...</p>
         ) : products && products.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-black">
             {products.map((product) => (
               <div
                 key={product._id}
-                className="p-4 border rounded-lg shadow hover:shadow-md transition-shadow"
+                className="bg-stone-200 rounded-lg text-center"
               >
-                <h3 className="font-semibold">{product.name}</h3>
-                <p className="text-gray-600">${product.price}</p>
-                <p className="text-sm text-gray-500">Stock: {product.stock}</p>
+                <Link
+                  href={`/product/${product._id}`}
+                  className="shadow hover:shadow-md transition-shadow"
+                >
+                  <Image
+                    src="/product-placeholder.jpeg"
+                    alt={product.name}
+                    width={750}
+                    height={750}
+                    className="w-full rounded-lg object-contain mb-2"
+                  />
+                </Link>
+                <h3 className="p-1 font-semibold">{product.name}</h3>
+                <p className="p-1">${product.price}</p>
+                <p className="p-1 text-sm">Quantity: {product.stock}</p>
+                <button
+                  className="mb-6 bg-green-500 py-2 rounded hover:bg-green-600 mt-2 min-w-[100px]"
+                  onClick={() => {}}
+                >
+                  Buy
+                </button>
               </div>
             ))}
           </div>
