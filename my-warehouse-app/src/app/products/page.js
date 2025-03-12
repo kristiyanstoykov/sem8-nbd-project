@@ -13,6 +13,21 @@ export default function Products() {
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
 
+  const [image, setImage] = useState(null);
+
+  const handleImageChange = async (e) => {
+    try {
+      if (e.target.files && e.target.files.length > 0) {
+        setImage(e.target.files[0]);
+      } else {
+        setImage(null);
+      }
+    } catch (error) {
+      console.error("Image upload error:", error);
+      setError("Failed to upload image");
+    }
+  };
+
   useEffect(() => {
     async function fetchProducts() {
       try {
@@ -42,27 +57,37 @@ export default function Products() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Prepare product data to send to the server
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("price", price);
+    formData.append("stock", stock);
+
+    // If an image has been uploaded, include the image URL in the product data
+    if (image) {
+      formData.append("file", image);
+    }
+
     try {
+      // Send product data to API
       const response = await fetch("/api/products", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, price, stock }),
+        body: formData,
       });
 
       if (response.ok) {
-        // Refresh products
         const refreshResponse = await fetch("/api/products");
         const data = await refreshResponse.json();
         if (data && data.products) {
           setProducts(data.products);
         }
 
-        // Clear form
+        // Clear form after successful submission
         setName("");
         setPrice("");
         setStock("");
+        // Reset image state
+        setImage(null);
       } else {
         const errorData = await response.json();
         setError(errorData.error || "Failed to add item");
@@ -75,17 +100,18 @@ export default function Products() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Products List</h1>
-
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
         </div>
       )}
 
-      <div className="mb-8">
+      <div className="mb-8 justify-items-center">
         <h2 className="text-xl font-semibold mb-2">Add New Item</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          className="justify-center space-y-4 min-w-96 max-w-screen-sm"
+        >
           <div>
             <label htmlFor="name" className="block mb-1">
               Name:
@@ -99,6 +125,7 @@ export default function Products() {
               required
             />
           </div>
+
           <div>
             <label htmlFor="price" className="block mb-1">
               Price:
@@ -112,6 +139,7 @@ export default function Products() {
               required
             />
           </div>
+
           <div>
             <label htmlFor="stock" className="block mb-1">
               Quantity:
@@ -127,6 +155,29 @@ export default function Products() {
               required
             />
           </div>
+
+          {/* Upload Image Section */}
+          <div>
+            <label htmlFor="thumbnail" className="block mb-1">
+              Upload Image:
+            </label>
+            <input
+              type="file"
+              id="thumbnail"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="border p-2 w-full text-white"
+            />
+            {image && (
+              <img
+                className="mt-2 w-32 h-32 object-cover rounded border"
+                alt="preview"
+                width={250}
+                src={URL.createObjectURL(image)}
+              />
+            )}
+          </div>
+
           <button
             type="submit"
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
@@ -149,15 +200,18 @@ export default function Products() {
               >
                 <Link
                   href={`/product/${product._id}`}
-                  className="shadow hover:shadow-md transition-shadow"
+                  className="shadow hover:shadow-md transition-shadow block"
                 >
-                  <Image
-                    src="/product-placeholder.jpeg"
-                    alt={product.name}
-                    width={750}
-                    height={750}
-                    className="w-full rounded-lg object-contain mb-2"
-                  />
+                  <div className="relative w-full pt-[100%]">
+                    <Image
+                      src={
+                        product.thumbnail_guid || "/product-placeholder.jpeg"
+                      }
+                      alt={product.name}
+                      fill
+                      className="absolute inset-0 object-contain rounded-lg p-2"
+                    />
+                  </div>
                 </Link>
                 <h3 className="p-1 font-semibold">{product.name}</h3>
                 <p className="p-1">${product.price}</p>

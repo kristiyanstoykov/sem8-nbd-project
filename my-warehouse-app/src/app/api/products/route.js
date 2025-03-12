@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import clientPromise from "../../../lib/mongodb";
+import { generateFilePath } from "../../../lib/helper";
 
 const dbName = process.env.DB_NAME;
 
@@ -29,43 +30,30 @@ export async function POST(request) {
     const client = await clientPromise;
     const db = client.db(dbName);
 
-    const body = await request.json();
-    let { name, price, stock } = body;
-    price = parseFloat(price);
-    stock = parseInt(stock);
+    const formData = await request.formData();
 
-    if (!name) {
+    const name = formData.get("name");
+    const price = parseFloat(formData.get("price"));
+    const stock = parseInt(formData.get("stock"), 10);
+    const file = formData.get("file");
+
+    if (!name || isNaN(price) || !Number.isInteger(stock)) {
       return NextResponse.json(
-        { error: "Product name is required" },
+        { error: "Invalid product data" },
         { status: 400 }
       );
     }
 
-    if (!price) {
-      return NextResponse.json(
-        { error: "Product price is required" },
-        { status: 400 }
-      );
-    }
-
-    if (isNaN(price)) {
-      return NextResponse.json(
-        { error: "Product price needs to be a float" },
-        { status: 400 }
-      );
-    }
-
-    if (!Number.isInteger(stock)) {
-      return NextResponse.json(
-        { error: "Product stock needs to be a whole number" },
-        { status: 400 }
-      );
-    }
+    // Generate file path and ensure directory exists
+    const { filePath, fileName, imgThumbnailPath } = await generateFilePath(
+      file
+    );
 
     const result = await db.collection("products").insertOne({
       name,
-      price: parseFloat(price),
-      stock: parseInt(stock, 10),
+      price,
+      stock,
+      thumbnail_guid: imgThumbnailPath,
       createdAt: new Date(),
     });
 
