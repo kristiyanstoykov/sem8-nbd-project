@@ -48,10 +48,17 @@ export async function signUp(unsafeData: z.infer<typeof signUpSchema>) {
       salt,
       role: "user",
     });
-
     if (user == null) throw new Error("Failed to create user");
 
-    await createUserSession({ id: user._id, role: user.role }, await cookies());
+    const insertedUser = await db
+      .collection("users")
+      .findOne({ _id: user.insertedId });
+    if (!insertedUser) throw new Error("Failed to retrieve inserted user");
+
+    const userId = insertedUser._id.toString();
+    const userRole = insertedUser.role;
+
+    await createUserSession({ id: userId, role: userRole }, await cookies());
   } catch (error) {
     if (error && typeof error === "object" && "message" in error) {
       return error.message as string;
