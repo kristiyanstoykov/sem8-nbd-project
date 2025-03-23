@@ -67,7 +67,7 @@ export default function ProductsCard() {
               className="bg-stone-200 rounded-lg text-center"
             >
               <Link
-                href={`/product/${product._id}`}
+                href={`/products/${product._id}`}
                 className="shadow hover:shadow-md transition-shadow block"
               >
                 <div className="relative w-full pt-[100%]">
