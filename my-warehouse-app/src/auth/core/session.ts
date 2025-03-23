@@ -42,20 +42,21 @@ export function getUserFromSession(cookies: Pick<Cookies, "get">) {
   return getUserFromSessionId(sessionId);
 }
 
-export async function removeUserFromSession(cookies: Cookies) {
+export async function removeUserFromSession(
+  cookies: Pick<Cookies, "get" | "delete">
+) {
   const sessionId = cookies.get(COOKIE_SESSION_KEY)?.value;
   if (sessionId == null) {
-    return;
+    return null;
   }
 
   const client = await clientPromise;
   const db = client.db(dbName);
   const sessionsCollection = db.collection("sessions");
 
-  const session = await sessionsCollection.findOneAndDelete({
+  const sessions = await sessionsCollection.deleteMany({
     sessionId: sessionId,
   });
-
   cookies.delete(COOKIE_SESSION_KEY);
 }
 
