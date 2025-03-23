@@ -4,14 +4,35 @@ import { generateFilePath } from "../../../lib/helper";
 
 const dbName = process.env.DB_NAME;
 
-export async function GET() {
+export async function GET(request) {
   try {
     const client = await clientPromise;
     const db = client.db(dbName);
 
+    const searchParam = request.nextUrl.searchParams.get("search");
+    const sortParam = request.nextUrl.searchParams.get("sort");
+
+    // Build the query
+    const query = {};
+
+    if (searchParam) {
+      query.name = { $regex: new RegExp(searchParam, "i") }; // case-insensitive search
+    }
+
+    // Build sort
+    let sortQuery = { createdAt: -1 }; // default sort
+    if (sortParam === "name") {
+      sortQuery = { name: 1 };
+    } else if (sortParam === "price-low") {
+      sortQuery = { price: 1 };
+    } else if (sortParam === "price-high") {
+      sortQuery = { price: -1 };
+    }
+
     const products = await db
       .collection("products")
-      .find({})
+      .find(query)
+      .sort(sortQuery)
       .limit(10)
       .toArray();
 
