@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 
 export default function ProductsCard() {
   const [products, setProducts] = useState([]);
@@ -68,8 +68,8 @@ export default function ProductsCard() {
     <div className="container mx-auto p-4">
       <div className="flex flex-col md:flex-row justify-between items-center mb-2 gap-2">
         <h2 className="text-xl font-semibold">Current Products</h2>
-        <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
-          {/* 🔍 Search input */}
+        <div className="flex items-stretch flex-col md:flex-row gap-2 w-full md:w-auto">
+          {/* Search input */}
           <div className="relative flex items-center w-full md:w-auto">
             <span className="absolute left-2 text-gray-500">
               <Image
@@ -88,7 +88,7 @@ export default function ProductsCard() {
             />
           </div>
 
-          {/* 🔃 Sort dropdown */}
+          {/* Sort dropdown */}
           <select
             className="border rounded p-2 text-black"
             onChange={(e) => setLocalSort(e.target.value)}
@@ -99,27 +99,34 @@ export default function ProductsCard() {
             <option value="price-high">Price: high to low</option>
           </select>
 
-          {/* 🔘 Search button */}
-          <button
-            className="border-blue-300 rounded p-2 bg-gray-200 text-black hover:bg-blue-200"
+          {/* Search button */}
+          <Button
+            className="border-blue-300 rounded p-2 bg-gray-200 text-black hover:bg-blue-200 h-[100%]"
             onClick={applyFilters}
           >
             Search
-          </button>
+          </Button>
 
-          {/* ❌ Clear button */}
-          <button
-            className="border-none rounded p-2 bg-red-500 text-white hover:bg-red-600"
+          {/* Clear button */}
+          <Button
+            className="border-none rounded p-2 bg-red-500 text-white hover:bg-red-600 h-[100%]"
             onClick={clearFilters}
           >
             Clear
-          </button>
+          </Button>
         </div>
       </div>
 
-      {/* 🧠 Products grid */}
+      {/* Products grid */}
       {loading ? (
-        <p>Loading products...</p>
+        <div className="flex justify-center items-center h-64">
+          <Image
+            src="/loader-animation.gif"
+            alt="Loading..."
+            width={100}
+            height={100}
+          />
+        </div>
       ) : products && products.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-black">
           {products.map((product) => (
