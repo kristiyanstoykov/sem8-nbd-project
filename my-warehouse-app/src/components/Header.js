@@ -78,41 +78,32 @@ const Header = async () => {
       <div className="flex space-x-3">
         {fullUser ? (
           <div className="flex items-center space-x-3">
-            <Link href="/profile" className="flex items-center">
+            <Link
+              href="/my-profile"
+              className="flex items-center hover:scale-110 transform duration-200"
+            >
               <Image
-                src="/profile-icon.png"
+                src="/my-profile.png"
                 alt="Profile Icon"
                 width={40}
                 height={40}
                 className="rounded-full border border-gray-300"
               />
             </Link>
-            <Button asChild>
-              <Link
-                href="/logout"
-                className="px-3 py-1 bg-red-600 hover:text-black text-white rounded hover:bg-red-200 transition-colors"
-              >
-                Logout
-              </Link>
-            </Button>
           </div>
         ) : (
           <>
-            <Button asChild>
-              <Link
-                href="/sign-in"
-                className="px-3 py-1 bg-blue-600 hover:text-black text-white rounded hover:bg-blue-200 transition-colors"
-              >
-                Sign in
-              </Link>
+            <Button
+              className="px-3 py-1 bg-blue-600 hover:text-black text-white rounded hover:bg-blue-200 transition-colors"
+              asChild
+            >
+              <Link href="/sign-in">Sign In</Link>
             </Button>
-            <Button asChild>
-              <Link
-                href="/sign-up"
-                className="px-3 py-1 bg-emerald-600 hover:text-black text-white rounded hover:bg-emerald-200 transition-colors"
-              >
-                Sign up
-              </Link>
+            <Button
+              className="px-3 py-1 bg-emerald-600 hover:text-black text-white rounded hover:bg-emerald-200 transition-colors"
+              asChild
+            >
+              <Link href="/sign-up">Sign Up</Link>
             </Button>
           </>
         )}
