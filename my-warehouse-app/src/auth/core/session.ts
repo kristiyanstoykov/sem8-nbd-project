@@ -42,6 +42,23 @@ export function getUserFromSession(cookies: Pick<Cookies, "get">) {
   return getUserFromSessionId(sessionId);
 }
 
+export async function removeUserFromSession(cookies: Cookies) {
+  const sessionId = cookies.get(COOKIE_SESSION_KEY)?.value;
+  if (sessionId == null) {
+    return;
+  }
+
+  const client = await clientPromise;
+  const db = client.db(dbName);
+  const sessionsCollection = db.collection("sessions");
+
+  const session = await sessionsCollection.findOneAndDelete({
+    sessionId: sessionId,
+  });
+
+  cookies.delete(COOKIE_SESSION_KEY);
+}
+
 export async function createUserSession(
   user: UserSession,
   cookies: Pick<Cookies, "set">
@@ -54,7 +71,7 @@ export async function createUserSession(
   // Parse and validate user data
   const userData = sessionSchema.parse(user);
 
-  // ✅ Ensure the TTL index exists
+  // Ensure the TTL index exists
   await sessionsCollection.createIndex(
     { expiresAt: 1 },
     { expireAfterSeconds: 0 }
