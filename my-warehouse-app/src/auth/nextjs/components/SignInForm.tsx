@@ -17,7 +17,7 @@ import { useState } from "react";
 import { signInSchema } from "../schemas";
 import Link from "next/link";
 
-export function SignInForm() {
+export function SignInForm({ theme }: { theme: string }) {
   const [error, setError] = useState<string>();
   const form = useForm<z.infer<typeof signInSchema>>({
     defaultValues: {
@@ -31,9 +31,18 @@ export function SignInForm() {
     setError(error);
   }
 
+  const formTheme = theme;
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className={`space-y-8 ${
+          formTheme === "dark"
+            ? "bg-gray-800 text-white"
+            : "bg-white text-black"
+        } p-6 rounded-xl`}
+      >
         {error && <p className="text-destructive">{error}</p>}
         <div className="flex gap-4">oAuth goes here</div>
         <FormField
@@ -43,7 +52,15 @@ export function SignInForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input type="email" {...field} />
+                <Input
+                  type="email"
+                  {...field}
+                  className={
+                    formTheme === "dark"
+                      ? "bg-gray-100 text-white"
+                      : "border-blue-200 bg-gray-50"
+                  }
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -56,17 +73,27 @@ export function SignInForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" {...field} />
+                <Input
+                  type="password"
+                  {...field}
+                  className={
+                    formTheme === "dark"
+                      ? "bg-gray-100 text-white"
+                      : "border-blue-200 bg-gray-50"
+                  }
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
         <div className="flex gap-4 justify-end">
-          <Button asChild variant="link">
-            <Link href="/sign-up">Sign Up</Link>
+          <Button
+            className="px-3 py-1 bg-blue-600 hover:text-black text-white rounded hover:bg-blue-200 transition-colors"
+            type="submit"
+          >
+            Sign In
           </Button>
-          <Button type="submit">Sign In</Button>
         </div>
       </form>
     </Form>
