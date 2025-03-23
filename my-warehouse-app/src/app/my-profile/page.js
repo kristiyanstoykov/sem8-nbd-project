@@ -13,11 +13,10 @@ import { getCurrentUser } from "@/auth/nextjs/currentUser";
 import { LogOutButton } from "@/auth/nextjs/components/LogOutButton";
 
 export default async function MyProfilePage() {
-  const fullUser = await getCurrentUser();
-
-  if (!fullUser) {
-    redirect("/sign-in");
-  }
+  const fullUser = await getCurrentUser({
+    withFullUser: true,
+    redirectIfNotFound: true,
+  });
 
   return (
     <div className="container my-auto mx-auto py-20 px-4 max-w-[550px]">
@@ -36,8 +35,8 @@ export default async function MyProfilePage() {
             />
           </div>
           <p className="mt-3 p-1">{fullUser.id}</p>
-          <p className="p-1">John Doe</p>
-          <p className="p-1">john.doe@example.com</p>
+          <p className="p-1">{fullUser.name}</p>
+          <p className="p-1">{fullUser.email}</p>
           <p className="p-1">{fullUser.role}</p>
         </CardContent>
         <CardFooter>
