@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation"; // Fix: Use useParams() in Next.js 13+
+import Image from "next/image";
+import { useParams, useRouter } from "next/navigation";
 import ProductsSingle from "../../../components/ProductsSingle";
 
 export default function ProductDetails() {
@@ -15,6 +16,7 @@ export default function ProductDetails() {
   useEffect(() => {
     if (!id) return; // Prevent fetch if ID is missing
 
+    setLoading(true);
     async function fetchProduct() {
       try {
         const response = await fetch(`/api/products/${id}`);
@@ -32,17 +34,34 @@ export default function ProductDetails() {
     fetchProduct();
   }, [id]);
 
-  if (loading) return <p className="text-center">Loading product details...</p>;
-  if (error) return <p className="text-center text-red-500">Error: {error}</p>;
-  if (!product) return <p className="text-center">Product not found</p>;
-
   return (
-    <div className="container mx-auto p-4 max-w-[850px]">
+    <div className="container mx-auto p-4 mt-28 mb-28 max-w-[850px]">
       <button onClick={() => router.back()} className="text-blue-200 mb-4">
         &larr; Back to Products
       </button>
-
-      <ProductsSingle product={product} />
+      {error && (
+        <div
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"
+          role="alert"
+        >
+          <strong className="font-bold">Error:</strong>{" "}
+          <span className="block sm:inline">{error}</span>
+        </div>
+      )}
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <Image
+            src="/loader-animation.gif"
+            alt="Loading..."
+            width={100}
+            height={100}
+          />
+        </div>
+      ) : !product ? (
+        <p className="text-center text-gray-500">No product found.</p>
+      ) : (
+        <ProductsSingle product={product} />
+      )}
     </div>
   );
 }

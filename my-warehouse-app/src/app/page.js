@@ -12,7 +12,7 @@ export default async function Home() {
   const fullUser = await getCurrentUser();
   return (
     <>
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-8">
+      <div className=" mt-20 mb-5 bg-gray-900 text-white flex items-center justify-center p-8">
         <ProductsCard />
       </div>
     </>
