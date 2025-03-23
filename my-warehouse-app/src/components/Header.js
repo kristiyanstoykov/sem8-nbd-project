@@ -1,9 +1,20 @@
+"use server";
+
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "../components/ui/button";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { getCurrentUser } from "../auth/nextjs/currentUser";
 
-const Header = () => {
+const Header = async () => {
+  const fullUser = await getCurrentUser();
+
   return (
     <header className="bg-white shadow-md py-4 px-6 flex justify-between items-center">
       <div className="logo">
@@ -65,22 +76,46 @@ const Header = () => {
         </ul>
       </nav>
       <div className="flex space-x-3">
-        <Button asChild>
-          <Link
-            href="/sign-in"
-            className="  px-3 py-1 bg-blue-600 hover:text-black text-white rounded hover:bg-blue-200 transition-colors"
-          >
-            Sign in
-          </Link>
-        </Button>
-        <Button asChild>
-          <Link
-            href="/sign-up"
-            className="px-3 py-1 bg-emerald-600 hover:text-black text-white rounded hover:bg-emerald-200 transition-colors"
-          >
-            Sign up
-          </Link>
-        </Button>
+        {fullUser ? (
+          <div className="flex items-center space-x-3">
+            <Link href="/profile" className="flex items-center">
+              <Image
+                src="/profile-icon.png"
+                alt="Profile Icon"
+                width={40}
+                height={40}
+                className="rounded-full border border-gray-300"
+              />
+            </Link>
+            <Button asChild>
+              <Link
+                href="/logout"
+                className="px-3 py-1 bg-red-600 hover:text-black text-white rounded hover:bg-red-200 transition-colors"
+              >
+                Logout
+              </Link>
+            </Button>
+          </div>
+        ) : (
+          <>
+            <Button asChild>
+              <Link
+                href="/sign-in"
+                className="px-3 py-1 bg-blue-600 hover:text-black text-white rounded hover:bg-blue-200 transition-colors"
+              >
+                Sign in
+              </Link>
+            </Button>
+            <Button asChild>
+              <Link
+                href="/sign-up"
+                className="px-3 py-1 bg-emerald-600 hover:text-black text-white rounded hover:bg-emerald-200 transition-colors"
+              >
+                Sign up
+              </Link>
+            </Button>
+          </>
+        )}
       </div>
     </header>
   );
