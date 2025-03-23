@@ -19,7 +19,37 @@ export async function signIn(unsafeData: z.infer<typeof signInSchema>) {
   const { success, data } = signInSchema.safeParse(unsafeData);
 
   if (!success) return "Unable to log you in";
-  // TODO implement
+  const client = await clientPromise;
+  const db = client.db(dbName);
+
+  const existingUser = await db
+    .collection("users")
+    .findOne({ email: data.email });
+
+  if (existingUser === null) {
+    return "Wrong email or password";
+  }
+
+  const isPasswordCorrect = await comparePasswords({
+    hashedPassword: existingUser.password,
+    password: data.password,
+    salt: existingUser.salt,
+  });
+
+  const userId = existingUser._id.toString();
+  const userRole = existingUser.role;
+
+  if (isPasswordCorrect === false) {
+    return "Wrong email or password";
+  }
+
+  await createUserSession(
+    {
+      id: userId,
+      role: userRole,
+    },
+    await cookies()
+  );
 
   redirect("/");
 }
@@ -70,6 +100,6 @@ export async function signUp(unsafeData: z.infer<typeof signUpSchema>) {
 }
 
 export async function logOut() {
-  // TODO implement
+  await removeUserFromSession(await cookies());
   redirect("/");
 }
