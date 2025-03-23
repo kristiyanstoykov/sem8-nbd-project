@@ -3,27 +3,52 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useSearchParams, useRouter } from "next/navigation";
+import { Button } from "./ui/button";
 
 export default function ProductsCard() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
-  const [stock, setStock] = useState("");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // 🟡 Store search & sort inputs locally
+  const [localSearch, setLocalSearch] = useState(
+    searchParams.get("search") || ""
+  );
+  const [localSort, setLocalSort] = useState(searchParams.get("sort") || "");
+
+  function applyFilters() {
+    const params = new URLSearchParams();
+
+    if (localSearch) params.set("search", localSearch);
+    if (localSort) params.set("sort", localSort);
+
+    router.push(`?${params.toString()}`);
+  }
+
+  function clearFilters() {
+    setLocalSearch("");
+    setLocalSort("");
+    router.push("?");
+  }
 
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const response = await fetch("/api/products");
+        const sort = searchParams.get("sort") || "default";
+        const search = searchParams.get("search") || "";
+
+        const response = await fetch(
+          `/api/products?sort=${sort}&search=${search}`
+        );
         const data = await response.json();
 
-        // Check if data.products exists before setting state
         if (data && data.products) {
           setProducts(data.products);
         } else {
-          console.error("API response missing products array:", data);
           setProducts([]);
           setError("Invalid response format from server");
         }
@@ -37,26 +62,62 @@ export default function ProductsCard() {
     }
 
     fetchProducts();
-  }, []);
+  }, [searchParams]); // 👈 This will now only change when user clicks "Search"
 
   return (
     <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-2">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-2 gap-2">
         <h2 className="text-xl font-semibold">Current Products</h2>
-        <select
-          className="border rounded p-2 text-black"
-          onChange={(e) => console.log("Sort by:", e.target.value)}
-          defaultValue=""
-        >
-          <option value="" disabled>
-            Sort by
-          </option>
-          <option value="default">Default</option>
-          <option value="name">Name</option>
-          <option value="price-low">Price: low to high</option>
-          <option value="price-high">Price: high to low</option>
-        </select>
+        <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+          {/* 🔍 Search input */}
+          <div className="relative flex items-center w-full md:w-auto">
+            <span className="absolute left-2 text-gray-500">
+              <Image
+                src="/search.png"
+                alt="Search Icon"
+                width={20}
+                height={20}
+              />
+            </span>
+            <input
+              type="text"
+              placeholder="Search products..."
+              className="border rounded pl-8 pr-2 py-2 w-full md:w-auto text-black"
+              onChange={(e) => setLocalSearch(e.target.value)}
+              value={localSearch}
+            />
+          </div>
+
+          {/* 🔃 Sort dropdown */}
+          <select
+            className="border rounded p-2 text-black"
+            onChange={(e) => setLocalSort(e.target.value)}
+            value={localSort}
+          >
+            <option value="default">Default</option>
+            <option value="price-low">Price: low to high</option>
+            <option value="price-high">Price: high to low</option>
+          </select>
+
+          {/* 🔘 Search button */}
+          <button
+            className="border-blue-300 rounded p-2 bg-gray-200 text-black hover:bg-blue-200"
+            onClick={applyFilters}
+          >
+            Search
+          </button>
+
+          {/* ❌ Clear button */}
+          <button
+            className="border-none rounded p-2 bg-red-500 text-white hover:bg-red-600"
+            onClick={clearFilters}
+          >
+            Clear
+          </button>
+        </div>
       </div>
+
+      {/* 🧠 Products grid */}
       {loading ? (
         <p>Loading products...</p>
       ) : products && products.length > 0 ? (
