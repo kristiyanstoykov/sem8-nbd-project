@@ -8,8 +8,6 @@ export async function GET(req, { params }) {
   try {
     const { id } = await params;
 
-    console.log("Product ID:", id);
-
     if (!ObjectId.isValid(id)) {
       return NextResponse.json(
         { error: "Invalid product ID" },
@@ -22,9 +20,6 @@ export async function GET(req, { params }) {
     const product = await db
       .collection("products")
       .findOne({ _id: new ObjectId(id) });
-
-    console.log("Product:");
-    console.log(product);
 
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
