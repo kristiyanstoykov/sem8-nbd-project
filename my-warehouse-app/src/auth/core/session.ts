@@ -73,10 +73,26 @@ export async function createUserSession(
   const userData = sessionSchema.parse(user);
 
   // Ensure the TTL index exists
-  await sessionsCollection.createIndex(
-    { expiresAt: 1 },
-    { expireAfterSeconds: 0 }
+  const existingIndexes = await sessionsCollection.indexes();
+  const expiresAtIndex = existingIndexes.find(
+    (index) => index.key?.expiresAt === 1
   );
+
+  if (!expiresAtIndex) {
+    await sessionsCollection.createIndex(
+      { expiresAt: 1 },
+      { expireAfterSeconds: SESSION_EXPIRATION_SECONDS / 1000 }
+    );
+  } else if (
+    expiresAtIndex.expireAfterSeconds !==
+    SESSION_EXPIRATION_SECONDS / 1000
+  ) {
+    await sessionsCollection.dropIndex(expiresAtIndex.name);
+    await sessionsCollection.createIndex(
+      { expiresAt: 1 },
+      { expireAfterSeconds: SESSION_EXPIRATION_SECONDS / 1000 }
+    );
+  }
 
   // Store expiresAt as a Date object
   const sessionExpiry = new Date();
