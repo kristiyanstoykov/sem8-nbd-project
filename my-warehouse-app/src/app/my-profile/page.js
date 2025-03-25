@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import { redirect } from "next/navigation";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { getCurrentUser } from "@/auth/nextjs/currentUser";
 import { LogOutButton } from "@/auth/nextjs/components/LogOutButton";
+import { Button } from "@/components/ui/button";
 
 export default async function MyProfilePage() {
   const fullUser = await getCurrentUser({
@@ -39,7 +40,14 @@ export default async function MyProfilePage() {
           <p className="p-1">{fullUser.email}</p>
           <p className="p-1">{fullUser.role}</p>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="flex items-baseline gap-2 space-y-4">
+          {fullUser.role === "admin" ? (
+            <Link href="/admin">
+              <Button className="bg-blue-300 text-black hover:bg-blue-600 hover:text-white px-4 py-2 rounded transition duration-300">
+                Admin Dashboard
+              </Button>
+            </Link>
+          ) : null}
           <LogOutButton />
         </CardFooter>
       </Card>
