@@ -33,3 +33,18 @@ export async function GET(req, { params }) {
     );
   }
 }
+
+export async function PUT(req, { params }) {
+  try {
+    const { name, price, stock, thumbnail_guid } = await req.formData();
+    console.log("name", name);
+    console.log("price", price);
+    console.log("stock", stock);
+    console.log("thumbnail_guid", thumbnail_guid);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
