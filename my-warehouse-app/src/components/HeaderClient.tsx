@@ -33,18 +33,27 @@ export default function HeaderClient({ fullUser }: { fullUser: any }) {
         } absolute top-full ms-12 w-full bg-white shadow-md md:shadow-none md:bg-transparent md:static md:flex md:items-center md:space-x-6 z-20`}
       >
         <ul className="flex flex-col md:flex-row md:space-x-6 p-4 md:p-0">
-          {["Dashboard", "Products", "Orders", "Suppliers", "Reports"].map(
-            (label) => (
-              <li key={label}>
+          {[{ label: "Dashboard", role: "admin" }]
+            .filter((item) => {
+              if (item.role && (!fullUser || fullUser.role !== item.role)) {
+                return false;
+              }
+              return true;
+            })
+            .map((item) => (
+              <li key={item.label}>
                 <Link
-                  href={`/${label.toLowerCase()}`}
+                  href={`/${
+                    item.label.toLowerCase() === "dashboard"
+                      ? "admin"
+                      : item.label.toLowerCase()
+                  }`}
                   className="block py-2 text-gray-700 hover:text-blue-600 transition-colors"
                 >
-                  {label}
+                  {item.label}
                 </Link>
               </li>
-            )
-          )}
+            ))}
         </ul>
       </nav>
 

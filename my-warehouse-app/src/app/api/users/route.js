@@ -39,10 +39,10 @@ export async function GET(req) {
 
 export async function POST(req) {
   try {
-    const user = await getCurrentUser({ withFullUser: true });
-    if (!user)
+    const currentUser = await getCurrentUser({ withFullUser: true });
+    if (!currentUser)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    if (user.role !== "admin")
+    if (currentUser.role !== "admin")
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const client = await clientPromise;
@@ -67,17 +67,20 @@ export async function POST(req) {
     }
 
     const salt = generateSalt();
-    const hashedPassword = hashPassword(password, salt);
+    const hashedPassword = await hashPassword(password, salt);
 
-    const newUser = {
-      name,
-      email,
-      role,
+    const result = await db.collection("users").insertOne({
+      name: name,
+      email: email,
       password: hashedPassword,
-      salt,
-    };
+      salt: salt,
+      role: role,
+    });
+    if (result == null) throw new Error("Failed to create user");
 
-    const result = await db.collection("users").insertOne(newUser);
+    console.log("Creating user with details:", {
+      result,
+    });
 
     return NextResponse.json({
       message: "User created successfully",

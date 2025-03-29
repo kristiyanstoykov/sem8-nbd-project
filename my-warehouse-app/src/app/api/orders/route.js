@@ -20,57 +20,63 @@ export async function GET(req) {
     const client = await clientPromise;
     const db = client.db(dbName);
 
-    const orders = await db
-      .collection("orders")
-      .aggregate([
-        {
-          $lookup: {
-            from: "users",
-            let: {
-              searchId: {
-                $toObjectId: "$client_id",
+    const pipeline = [];
+
+    // ✅ Добавяме филтър по status, ако е подаден
+    if (status) {
+      pipeline.push({
+        $match: { status },
+      });
+    }
+
+    pipeline.push(
+      {
+        $lookup: {
+          from: "users",
+          let: {
+            searchId: {
+              $toObjectId: "$client_id",
+            },
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ["$_id", "$$searchId"],
+                },
               },
             },
-            pipeline: [
-              {
-                $match: {
-                  $expr: {
-                    $eq: ["$_id", "$$searchId"],
-                  },
-                },
+            {
+              $project: {
+                name: 1,
               },
-              {
-                $project: {
-                  name: 1,
-                },
-              },
-            ],
-            as: "user",
-          },
+            },
+          ],
+          as: "user",
         },
-        {
-          $unwind: "$user",
+      },
+      {
+        $unwind: "$user",
+      },
+      {
+        $project: {
+          _id: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          status: 1,
+          total_price: 1,
+          user_name: "$user.name",
         },
-        {
-          $project: {
-            _id: 1,
-            createdAt: 1,
-            updatedAt: 1,
-            status: 1,
-            total_price: 1,
-            user_name: "$user.name",
-          },
+      },
+      {
+        $sort: {
+          _id: 1,
+          church: 1,
         },
-        {
-          $sort: {
-            _id: 1,
-            church: 1,
-          },
-        },
-      ])
-      .toArray();
+      }
+    );
 
-    console.table(orders);
+    const orders = await db.collection("orders").aggregate(pipeline).toArray();
 
     return NextResponse.json({ orders }, { status: 200 });
   } catch (err) {
