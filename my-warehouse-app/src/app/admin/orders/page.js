@@ -1,3 +1,5 @@
+import OrdersCardAdmin from "@/components/OrdersCardAdmin";
+
 export const metadata = {
   title: "Manage Orders",
 };
@@ -9,6 +11,7 @@ export default function ManageOrdersPage() {
       <p className="text-white mb-4">
         Here you can add, edit or delete orders.
       </p>
+      <OrdersCardAdmin />
     </>
   );
 }

@@ -26,37 +26,11 @@ export default function HeaderClient({ fullUser }: { fullUser: any }) {
         </Link>
       </div>
 
-      {/* Right side: Profile icon + Hamburger */}
-      <div className="flex items-center gap-3">
-        {/* Profile icon (only if logged in) */}
-
-        {/* Hamburger button */}
-        <button
-          className="md:hidden text-gray-700"
-          onClick={() => setMenuOpen((prev) => !prev)}
-          aria-label="Toggle menu"
-        >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d={menuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
-            />
-          </svg>
-        </button>
-      </div>
-
       {/* Nav links */}
       <nav
         className={`${
           menuOpen ? "block" : "hidden"
-        } absolute top-full left-0 w-full bg-white shadow-md md:shadow-none md:bg-transparent md:static md:flex md:items-center md:space-x-6 z-20`}
+        } absolute top-full ms-12 w-full bg-white shadow-md md:shadow-none md:bg-transparent md:static md:flex md:items-center md:space-x-6 z-20`}
       >
         <ul className="flex flex-col md:flex-row md:space-x-6 p-4 md:p-0">
           {["Dashboard", "Products", "Orders", "Suppliers", "Reports"].map(
@@ -74,37 +48,67 @@ export default function HeaderClient({ fullUser }: { fullUser: any }) {
         </ul>
       </nav>
 
-      {/* User Buttons */}
-      <div className="hidden md:flex space-x-3 items-center">
-        {fullUser ? (
-          <Link
-            href="/my-profile"
-            className="flex items-center hover:scale-110 transform duration-200"
+      {/* Right side: Profile icon + Hamburger */}
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3">
+          {/* Profile icon (only if logged in) */}
+
+          {/* Hamburger button */}
+          <button
+            className="md:hidden text-gray-700"
+            onClick={() => setMenuOpen((prev) => !prev)}
+            aria-label="Toggle menu"
           >
-            <Image
-              src="/my-profile.png"
-              alt="Profile Icon"
-              width={40}
-              height={40}
-              className="rounded-full border border-gray-300"
-            />
-          </Link>
-        ) : (
-          <>
-            <Button
-              className="px-3 py-1 bg-blue-600 hover:text-black text-white rounded hover:bg-blue-200 transition-colors"
-              asChild
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <Link href="/sign-in">Sign In</Link>
-            </Button>
-            <Button
-              className="px-3 py-1 bg-emerald-600 hover:text-black text-white rounded hover:bg-emerald-200 transition-colors"
-              asChild
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d={
+                  menuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"
+                }
+              />
+            </svg>
+          </button>
+        </div>
+
+        {/* User Buttons */}
+        <div className="md:flex space-x-3 items-center">
+          {fullUser ? (
+            <Link
+              href="/my-profile"
+              className="flex items-center hover:scale-110 transform duration-200 min-w-[32px]"
             >
-              <Link href="/sign-up">Sign Up</Link>
-            </Button>
-          </>
-        )}
+              <Image
+                src="/my-profile.png"
+                alt="Profile Icon"
+                width={32}
+                height={32}
+                className="rounded-full border border-gray-300"
+              />
+            </Link>
+          ) : (
+            <>
+              <Button
+                className="px-3 py-1 bg-blue-600 hover:text-black text-white rounded hover:bg-blue-200 transition-colors"
+                asChild
+              >
+                <Link href="/sign-in">Sign In</Link>
+              </Button>
+              <Button
+                className="px-3 py-1 bg-emerald-600 hover:text-black text-white rounded hover:bg-emerald-200 transition-colors"
+                asChild
+              >
+                <Link href="/sign-up">Sign Up</Link>
+              </Button>
+            </>
+          )}
+        </div>
       </div>
     </header>
   );

@@ -32,33 +32,52 @@ export default function ProductsCardAdmin() {
     router.push("?");
   }
 
-  useEffect(() => {
-    async function fetchProducts() {
-      try {
-        const sort = searchParams.get("sort") || "default";
-        const search = searchParams.get("search") || "";
-
-        const response = await fetch(
-          `/api/products?sort=${sort}&search=${search}`
-        );
-        const data = await response.json();
-
-        if (data && data.products) {
-          setProducts(data.products);
-        } else {
-          setProducts([]);
-          setError("Invalid response format from server");
-        }
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        setProducts([]);
-        setError("Failed to fetch products");
-        setLoading(false);
-      }
+  function deleteProduct(productId) {
+    if (confirm("Are you sure you want to delete this product?")) {
+      fetch(`/api/products/${productId}`, {
+        method: "DELETE",
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            setProducts((prev) =>
+              prev.filter((product) => product._id !== productId)
+            );
+          } else {
+            alert("Failed to delete product");
+          }
+        })
+        .catch((error) => {
+          console.error("Error deleting product:", error);
+          alert("Failed to delete product");
+        });
     }
+  }
 
-    fetchProducts();
+  async function fetchProducts(search, sort) {
+    try {
+      const response = await fetch(
+        `/api/products?sort=${sort || "default"}&search=${search || ""}`
+      );
+      const data = await response.json();
+
+      if (data && data.products) {
+        setProducts(data.products);
+      } else {
+        setProducts([]);
+        setError("Invalid response format from server");
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      setProducts([]);
+      setError("Failed to fetch products");
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchProducts(searchParams.get("search"), searchParams.get("sort"));
   }, [searchParams]);
 
   return (
@@ -77,6 +96,7 @@ export default function ProductsCardAdmin() {
                 alt="Search Icon"
                 width={20}
                 height={20}
+                sizes="(max-width: 768px) 100vw, 32px"
               />
             </span>
             <input
@@ -118,6 +138,7 @@ export default function ProductsCardAdmin() {
             alt="Loading..."
             width={100}
             height={100}
+            sizes="(max-width: 768px) 100vw, 32px"
           />
         </div>
       ) : products && products.length > 0 ? (
@@ -133,6 +154,7 @@ export default function ProductsCardAdmin() {
                   src={product.thumbnail_guid || "/product-placeholder.jpeg"}
                   alt={product.name}
                   fill
+                  sizes="(max-width: 768px) 100vw, 32px"
                   className="object-contain rounded"
                 />
               </div>
@@ -159,10 +181,11 @@ export default function ProductsCardAdmin() {
                     alt="Edit"
                     width={32}
                     height={32}
+                    sizes="(max-width: 768px) 100vw, 32px"
                   />
                 </button>
                 <button
-                  onClick={() => console.log("Delete", product._id)}
+                  onClick={() => deleteProduct(product._id)}
                   className="hover:scale-125 transition-transform duration-200"
                 >
                   <Image
@@ -170,6 +193,7 @@ export default function ProductsCardAdmin() {
                     alt="Delete"
                     width={32}
                     height={32}
+                    sizes="(max-width: 768px) 100vw, 32px"
                   />
                 </button>
               </div>
