@@ -201,7 +201,7 @@ export default function ProductsCardAdmin() {
           ))}
         </div>
       ) : (
-        <p>No products found. Add your first one!</p>
+        <p className="text-red-400">No products found.</p>
       )}
     </div>
   );

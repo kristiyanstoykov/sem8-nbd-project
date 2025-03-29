@@ -20,7 +20,7 @@ const ProductsSingle = ({ product }) => {
         <p className="text-lg font-semibold text-green-600">${product.price}</p>
         <p className="text-sm text-gray-600">Stock: {product.stock}</p>
 
-        <button className="bg-green-500 text-white py-2 px-4 rounded mt-4 hover:bg-green-600">
+        <button className="bg-green-500 text-black py-2 px-4 rounded mt-4 hover:bg-green-600">
           Buy Now
         </button>
       </div>
