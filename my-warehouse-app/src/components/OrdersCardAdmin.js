@@ -100,8 +100,9 @@ export default function OrdersCardAdmin() {
             <thead className="bg-gray-200 text-left">
               <tr>
                 <th className="p-3 border-b">Order ID</th>
-                <th className="p-3 border-b">Client</th>
-                <th className="p-3 border-b">Status</th>
+                <th className="p-3 border-b text-right">Client</th>
+                <th className="p-3 border-b text-right">Total price</th>
+                <th className="p-3 border-b text-right">Status</th>
                 <th className="p-3 border-b text-center">Actions</th>
               </tr>
             </thead>
@@ -116,10 +117,13 @@ export default function OrdersCardAdmin() {
                       #{order._id}
                     </Link>
                   </td>
-                  <td className="p-3">
+                  <td className="p-3 text-right">
                     {order.user_name || order.client_id || "Unknown"}
                   </td>
-                  <td className="p-3 capitalize">{order.status}</td>
+                  <td className="p-3 text-right">
+                    {parseFloat(order.total_price)}
+                  </td>
+                  <td className="p-3 capitalize text-right">{order.status}</td>
                   <td className="p-3 text-center">
                     <div className="flex gap-2 justify-center">
                       <button

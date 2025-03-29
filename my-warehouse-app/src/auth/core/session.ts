@@ -14,7 +14,8 @@ const sessionSchema = z.object({
   role: z.enum(userRoles),
 });
 
-const SESSION_EXPIRATION_SECONDS = 4 * 60 * 60 * 1000; // 4 hours
+const SESSION_EXPIRATION_SECONDS = 4 * 60 * 60 * 1000; // 4 hours in seconds
+// const SESSION_EXPIRATION_SECONDS = 10 * 1000; // 10s expiration in seconds
 const COOKIE_SESSION_KEY = "session-id";
 
 type UserSession = z.infer<typeof sessionSchema>;
@@ -81,7 +82,7 @@ export async function createUserSession(
   if (!expiresAtIndex) {
     await sessionsCollection.createIndex(
       { expiresAt: 1 },
-      { expireAfterSeconds: SESSION_EXPIRATION_SECONDS / 1000 }
+      { expireAfterSeconds: 0, background: true }
     );
   } else if (
     expiresAtIndex.expireAfterSeconds !==
@@ -90,7 +91,10 @@ export async function createUserSession(
     await sessionsCollection.dropIndex(expiresAtIndex.name);
     await sessionsCollection.createIndex(
       { expiresAt: 1 },
-      { expireAfterSeconds: SESSION_EXPIRATION_SECONDS / 1000 }
+      {
+        expireAfterSeconds: 0,
+        background: true,
+      }
     );
   }
 
